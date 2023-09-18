@@ -18,16 +18,17 @@ ITERS=10000
 TBS=128
 
 TGT_LEN=128
-INPUT_SIZE=128
+INPUT_SIZE=64
 
 MAX_N_SEGMENTSS=(1 1 1)
-MEMORY_SIZES=(10 0 5)
-BSS=(2 2 2)
+MEMORY_SIZES=(0 0 0) #(10 0 5)
+BSS=(1 1 1)  #(2 2 2)
 
 for N in 1
 do
 
-for MODEL_NAME in gpt2
+# Try bigcode/gpt_bigcode-santacoder, bigcode/tiny_starcoder_py
+for MODEL_NAME in bigcode/tiny_starcoder_py
 do
 
 for (( j=0; j<${#MEMORY_SIZES[@]}; j++ ))
