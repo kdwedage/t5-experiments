@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # CUDA_VISIBLE_DEVICES=1,2 NP=2 ./test_bert_sparse_pretrain_train_valid.sh
-NP=1
-CUDA_VISIBLE_DEVICES=0
+NP=1 #4
+CUDA_VISIBLE_DEVICES=0 #,1,2,3
 set -e
 
 CUBLAS_WORKSPACE_CONFIG=:4096:2
@@ -18,11 +18,11 @@ ITERS=10000
 TBS=128
 
 TGT_LEN=128
-INPUT_SIZE=64
+INPUT_SIZE=512
 
 MAX_N_SEGMENTSS=(1 1 1)
-MEMORY_SIZES=(0 0 0) #(10 0 5)
-BSS=(1 1 1)  #(2 2 2)
+MEMORY_SIZES=(10 0 5)
+BSS=(2 2 2)
 
 for N in 1
 do
@@ -51,7 +51,7 @@ do
 
 echo RUNNING: TASK_NAME SRC_LEN MODEL_NAME MODEL_CLS N_SEG MEMORY_SIZE INPUT_SEQ_LEN LR N
 echo RUNNING: $TASK_NAME $SRC_LEN $MODEL_NAME $MODEL_CLS $MAX_N_SEGMENTS $MEMORY_SIZE $INPUT_SEQ_LEN $LR $N
-accelerate launch --num_processes $NP --config_file /home/ubuntu/sept18/t5-experiments/accelerate.yaml /home/ubuntu/sept18/t5-experiments/run_finetuning_scrolls_rmt_decoder.py \
+accelerate launch --num_processes $NP --config_file /home/ubuntu/Documents/kwedage_research/t5/t5-experiments/accelerate.yaml /home/ubuntu/Documents/kwedage_research/t5/t5-experiments/custom_finetune.py \
         --task_name $TASK_NAME \
         --model_path runs/test/${TASK_NAME}/$MODEL_NAME/lr${LR}_${SCHEDULER}_adamw_wd1e-03_${INPUT_SEQ_LEN}-${TGT_LEN}-${MAX_N_SEGMENTS}x${INPUT_SIZE}_mem${MEMORY_SIZE}_bs${TBS}_iters${ITERS}_${SEGMENT_ORDERING}_bptt-${K2}/run_$N \
         --from_pretrained $MODEL_NAME \
