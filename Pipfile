@@ -13,6 +13,7 @@ nltk = "*"
 six = "*"
 peft = "*"
 tiktoken = "*"
+torchmetrics = "*"
 
 [dev-packages]
 

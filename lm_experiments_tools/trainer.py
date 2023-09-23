@@ -121,7 +121,7 @@ class TrainerArgs:
         metadata={'help': 'torch.optim.lr_scheduler.ReduceLROnPlateau threshold_mode parameter. (default: 1e-08)'})
     # metrics args
     optimize_metric: str = field(
-        default='loss',
+        default='extended_edit_distance',
         metadata={'help': 'metric name to optimize on validation set, save the best model, drop lr (default: loss)'})
     optimize_mode: str = field(
         default='min',

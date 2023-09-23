@@ -349,7 +349,6 @@ if __name__ == '__main__':
         dataset = pickle.load(f)
 
     train_dataset = dataset['train']
-    breakpoint()
     # shuffle train data each epoch (one loop over train_dataset)
     train_rnd_generator = torch.Generator()
     train_rnd_generator.manual_seed(args.seed)

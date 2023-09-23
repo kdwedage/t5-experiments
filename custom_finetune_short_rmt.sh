@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # CUDA_VISIBLE_DEVICES=1,2 NP=2 ./test_bert_sparse_pretrain_train_valid.sh
-NP=4
-CUDA_VISIBLE_DEVICES=0 #,1,2,3
+CUDA_VISIBLE_DEVICES=0
+NP=1
 set -e
 
 CUBLAS_WORKSPACE_CONFIG=:4096:2
@@ -11,24 +11,22 @@ MODEL_TYPE=decoder
 MEMORY_CELL=modeling_rmt.language_modeling:MemoryCell
 RECURRENT_WRAPPER=modeling_rmt.language_modeling:RecurrentWrapper
 BACKBONE_CLS=transformers:AutoModelForCausalLM
-TASK_NAME=contract_nli
-METRIC=exact_match
+TASK_NAME=wikitext-2-v1
 
 ITERS=10000
 TBS=32
 
 TGT_LEN=128
-INPUT_SIZE=512
+INPUT_SIZE=128
 
-MAX_N_SEGMENTSS=(1 1 1)
-MEMORY_SIZES=(10 0 5)
+MAX_N_SEGMENTSS=(1 2 2)
+MEMORY_SIZES=(2 1 2)
 BSS=(2 2 2)
 
 for N in 1
 do
 
-# Try bigcode/gpt_bigcode-santacoder, bigcode/tiny_starcoder_py
-for MODEL_NAME in bigcode/tiny_starcoder_py
+for MODEL_NAME in gpt2
 do
 
 for (( j=0; j<${#MEMORY_SIZES[@]}; j++ ))
@@ -51,9 +49,9 @@ do
 
 echo RUNNING: TASK_NAME SRC_LEN MODEL_NAME MODEL_CLS N_SEG MEMORY_SIZE INPUT_SEQ_LEN LR N
 echo RUNNING: $TASK_NAME $SRC_LEN $MODEL_NAME $MODEL_CLS $MAX_N_SEGMENTS $MEMORY_SIZE $INPUT_SEQ_LEN $LR $N
-accelerate launch --num_processes $NP --config_file /home/ubuntu/Documents/kwedage_research/t5/t5-experiments/accelerate.yaml /home/ubuntu/Documents/kwedage_research/t5/t5-experiments/custom_finetune.py \
+accelerate launch --num_processes $NP --config_file /home/ubuntu/Documents/kwedage_research/t5/t5-experiments/accelerate.yaml /home/ubuntu/Documents/kwedage_research/t5/t5-experiments/custom_finetune_lm.py \
         --task_name $TASK_NAME \
-        --model_path runs/test/${TASK_NAME}/$MODEL_NAME/lr${LR}_${SCHEDULER}_adamw_wd1e-03_${INPUT_SEQ_LEN}-${TGT_LEN}-${MAX_N_SEGMENTS}x${INPUT_SIZE}_mem${MEMORY_SIZE}_bs${TBS}_iters${ITERS}_${SEGMENT_ORDERING}_bptt-${K2}/run_$N \
+        --model_path ../runs/test/${TASK_NAME}/$MODEL_NAME/${SCHEDULER}_adamw_wd1e-03_${INPUT_SEQ_LEN}-${TGT_LEN}-${MAX_N_SEGMENTS}x${INPUT_SIZE}_mem${MEMORY_SIZE}_bs${TBS}_${SEGMENT_ORDERING}_bptt-${K2}_from_cpt_0-1/run_$N \
         --from_pretrained $MODEL_NAME \
         --model_type $MODEL_TYPE \
         --memory_cell_cls $MEMORY_CELL \
@@ -66,13 +64,12 @@ accelerate launch --num_processes $NP --config_file /home/ubuntu/Documents/kweda
         --max_n_segments $MAX_N_SEGMENTS\
         --batch_size $BS --gradient_accumulation_steps $(($TBS/($BS*$NP))) \
         --iters $ITERS \
-        --use_generate_on_valid \
-        --k2 $K2 \
+        --save_best \
+        --k1 -1 --k2 $K2 \
         --optimizer AdamW  --weight_decay 0.001 \
         --lr ${LR} --lr_scheduler $SCHEDULER --num_warmup_steps $(($ITERS/10)) \
         --data_n_workers 2 \
         --log_interval $(($ITERS/100)) --valid_interval $(($ITERS/10)) \
-        --optimize_metric $METRIC --optimize_mode max \
         --show_valid_examples 5 \
         --early_stopping_patience 15 \
         --seed $(($N+42)) \
