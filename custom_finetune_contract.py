@@ -343,7 +343,7 @@ if __name__ == '__main__':
     #logger.info(f'preparing dataset for: {args.task_name}')
     #dataset = datasets.load_dataset('tau/scrolls', args.task_name)
 
-    dataset_path = '/home/ubuntu/Documents/kwedage_research/DataTraining/cache/dataset2_1000.pkl'
+    dataset_path = '../dataset2_1000.pkl' #/home/ubuntu/Documents/kwedage_research/DataTraining/cache/dataset2_1000.pkl'
     logger.info(f'Loading dataset: {dataset_path.split("/")[-1]}')
     with open(dataset_path, 'rb') as f:
         dataset = pickle.load(f)
