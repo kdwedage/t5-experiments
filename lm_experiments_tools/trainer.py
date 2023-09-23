@@ -35,10 +35,10 @@ class TrainerArgs:
         default=None,
         metadata={'help': 'log on validation data every N batches (default: None)'})
     save_interval: Optional[int] = field(
-        default=None,
+        default=1000,
         metadata={'help': 'save model every N steps (default: None)'})
     save_best: bool = field(
-        default=False,
+        default=True,
         metadata={'help': 'Save best checkpoint if validation set is provided (default: False)'})
     use_generate_on_valid: bool = field(
         default=False,
