@@ -16,14 +16,14 @@ TASK_NAME=contract_nli
 METRIC=exact_match
 
 ITERS=10000
-TBS=128
+TBS=1
 
-TGT_LEN=512
-INPUT_SIZE=512
+TGT_LEN=128
+INPUT_SIZE=128
 
-MAX_N_SEGMENTSS=(10000 1 1)
-MEMORY_SIZES=(100 0 5)
-BSS=(2 2 2)
+MAX_N_SEGMENTSS=(100 1 1)
+MEMORY_SIZES=(32 0 5)
+BSS=(1 1 1)
 
 for N in 1
 do
@@ -51,7 +51,7 @@ do
 
 echo RUNNING: TASK_NAME SRC_LEN MODEL_NAME MODEL_CLS N_SEG MEMORY_SIZE INPUT_SEQ_LEN LR N
 echo RUNNING: $TASK_NAME $SRC_LEN $MODEL_NAME $MODEL_CLS $MAX_N_SEGMENTS $MEMORY_SIZE $INPUT_SEQ_LEN $LR $N
-accelerate launch --num_processes $NP --config_file /home/ubuntu/Documents/kwedage_research/t5/t5-experiments/accelerate.yaml /home/ubuntu/Documents/kwedage_research/t5/t5-experiments/dataset2_finetune.py \
+accelerate launch --num_processes $NP --config_file /home/ubuntu/t5-experiments/accelerate.yaml /home/ubuntu/t5-experiments/dataset2_finetune.py \
         --task_name $TASK_NAME \
         --model_path runs/test/${TASK_NAME}/$MODEL_NAME/lr${LR}_${SCHEDULER}_adamw_wd1e-03_${INPUT_SEQ_LEN}-${TGT_LEN}-${MAX_N_SEGMENTS}x${INPUT_SIZE}_mem${MEMORY_SIZE}_bs${TBS}_iters${ITERS}_${SEGMENT_ORDERING}_bptt-${K2}/run_$N \
         --from_pretrained $MODEL_NAME \

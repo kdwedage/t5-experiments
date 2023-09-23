@@ -346,7 +346,7 @@ if __name__ == '__main__':
     # get train dataset
     args.task_name = 'dataset2'
     logger.info(f'preparing dataset for: {args.task_name}')
-    with open('/home/ubuntu/Documents/kwedage_research/DataTraining/cache/dataset2_1000.pkl', 'rb') as f:
+    with open('/home/ubuntu/dataset2_1000.pkl', 'rb') as f:
         dataset = pickle.load(f)
 
     train_dataset = dataset['train']
