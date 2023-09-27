@@ -346,7 +346,7 @@ if __name__ == '__main__':
     # get train dataset
     args.task_name = 'dataset2'
     logger.info(f'preparing dataset for: {args.task_name}')
-    with open('/home/ubuntu/dataset2_1000.pkl', 'rb') as f:
+    with open('/root/dataset2_1000.pkl', 'rb') as f:
         dataset = pickle.load(f)
 
     train_dataset = dataset['train']
@@ -360,7 +360,7 @@ if __name__ == '__main__':
     # get validation dataset
     valid_dataloader = None
     logger.info(f'preparing validation data from: {args.task_name}')
-    valid_dataset = dataset['valid']
+    valid_dataset = [dataset['valid'][0]] #Kevin only 1 validation to get training working.
     
     # Kevin
     #if args.task_name in tasks_with_duplicates:
