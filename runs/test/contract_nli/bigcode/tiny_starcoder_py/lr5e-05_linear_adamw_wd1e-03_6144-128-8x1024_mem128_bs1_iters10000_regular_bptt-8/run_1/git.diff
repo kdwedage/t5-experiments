@@ -1,0 +1,55 @@
+diff --git a/dataset2_finetune.py b/dataset2_finetune.py
+index 29ac07d..7fad665 100644
+--- a/dataset2_finetune.py
++++ b/dataset2_finetune.py
+@@ -346,7 +346,7 @@ if __name__ == '__main__':
+     # get train dataset
+     args.task_name = 'dataset2'
+     logger.info(f'preparing dataset for: {args.task_name}')
+-    with open('/root/dataset2_1000.pkl', 'rb') as f:
++    with open('/home/dataset2_1000.pkl', 'rb') as f:
+         dataset = pickle.load(f)
+ 
+     train_dataset = dataset['train']
+@@ -360,8 +360,8 @@ if __name__ == '__main__':
+     # get validation dataset
+     valid_dataloader = None
+     logger.info(f'preparing validation data from: {args.task_name}')
+-    valid_dataset = [dataset['valid'][0]] #Kevin only 1 validation to get training working.
+-    
++    valid_dataset = dataset['valid']
++
+     # Kevin
+     #if args.task_name in tasks_with_duplicates:
+     #    valid_dataset = drop_duplicates_in_input(valid_dataset)
+diff --git a/dataset2_finetune.sh b/dataset2_finetune.sh
+index 2d2d895..3c3d65f 100755
+--- a/dataset2_finetune.sh
++++ b/dataset2_finetune.sh
+@@ -18,12 +18,12 @@ METRIC=exact_match
+ ITERS=10000
+ TBS=1
+ 
+-TGT_LEN=512
+-INPUT_SIZE=4096
++TGT_LEN=128
++INPUT_SIZE=1024
+ 
+-MAX_N_SEGMENTSS=(2)
+-MEMORY_SIZES=(16)
+-BSS=(1)
++MAX_N_SEGMENTSS=(8 8)
++MEMORY_SIZES=(128 64)
++BSS=(1 1)
+ 
+ for N in 1
+ do
+@@ -51,7 +51,7 @@ do
+ 
+ echo RUNNING: TASK_NAME SRC_LEN MODEL_NAME MODEL_CLS N_SEG MEMORY_SIZE INPUT_SEQ_LEN LR N
+ echo RUNNING: $TASK_NAME $SRC_LEN $MODEL_NAME $MODEL_CLS $MAX_N_SEGMENTS $MEMORY_SIZE $INPUT_SEQ_LEN $LR $N
+-accelerate launch --num_processes $NP --config_file /root/t5-experiments/accelerate.yaml /root/t5-experiments/dataset2_finetune.py \
++accelerate launch --num_processes $NP --config_file /home/t5-experiments/accelerate.yaml /home/t5-experiments/dataset2_finetune.py \
+         --task_name $TASK_NAME \
+         --model_path runs/test/${TASK_NAME}/$MODEL_NAME/lr${LR}_${SCHEDULER}_adamw_wd1e-03_${INPUT_SEQ_LEN}-${TGT_LEN}-${MAX_N_SEGMENTS}x${INPUT_SIZE}_mem${MEMORY_SIZE}_bs${TBS}_iters${ITERS}_${SEGMENT_ORDERING}_bptt-${K2}/run_$N \
+         --from_pretrained $MODEL_NAME \

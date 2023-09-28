@@ -1,0 +1,10 @@
+{
+    "train": {
+        "loss": 5.712079048156738
+    },
+    "valid": {
+        "loss": 7.627006011009216,
+        "exact_match": 0.0,
+        "extended_edit_distance": 0.9642050266265869
+    }
+}
