@@ -22,9 +22,6 @@ from torch.nn.utils.rnn import pad_sequence
 
 import accelerate
 
-# KEVIN
-from peft import LoraConfig, get_peft_model, TaskType
-
 # load_dotenv()
 
 logger_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -128,10 +125,7 @@ parser.add_argument('--relative_step', action='store_true', default=False,
                     help='Adafactor relative_step (default: False)')
 parser.add_argument('--warmup_init', action='store_true', default=False,
                     help='Adafactor warmup_init (default: False)')
-parser.add_argument('--use_lora', action='store_true', default=False, help='')
-parser.add_argument('--lora_attn_dim', type=int, default=8, help='')
-parser.add_argument('--lora_attn_alpha', type=int, default=32, help='')
-parser.add_argument('--lora_dropout', type=float, default=0.1, help='')
+
 
 def download_metric():
     scrolls_metric_path = hf_hub_download(repo_id="tau/scrolls", filename="metrics/scrolls.py", repo_type="dataset")
@@ -366,8 +360,7 @@ if __name__ == '__main__':
     # get validation dataset
     valid_dataloader = None
     logger.info(f'preparing validation data from: {args.task_name}')
-    # Kevin
-    valid_dataset = [dataset['valid'][0]]
+    valid_dataset = [dataset['valid'][0]] # KEVIN
 
     # Kevin
     #if args.task_name in tasks_with_duplicates:
@@ -393,20 +386,6 @@ if __name__ == '__main__':
     ## add [GEN] token
     model.resize_token_embeddings(len(tokenizer))
     
-
-    if args.use_lora:
-        peft_config = LoraConfig(
-            task_type=TaskType.CAUSAL_LM, 
-            inference_mode=False, 
-            r=args.lora_attn_dim, 
-            lora_alpha=args.lora_attn_alpha, 
-            lora_dropout=args.lora_dropout
-            )
-        model = get_peft_model(model, peft_config)
-        logger.info(f'Added LoRA, trainable parameters with LoRA only:')
-        model.print_trainable_parameters()
-
-
     ## load cpt of backbone model
     if args.backbone_cpt:
         backbone_cpt = os.path.join(args.backbone_cpt, "model_best.pth")

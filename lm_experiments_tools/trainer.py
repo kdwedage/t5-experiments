@@ -303,6 +303,7 @@ class Trainer:
                 grad_sync_context = contextlib.nullcontext if is_last_batch else self.accelerator.no_sync
                 with grad_sync_context(self.model):
                     subbatch = {k: batch[k][j: j + self.args.batch_size] for k in batch}
+                    
                     # filter items from batch that are not used by model forward
                     outputs = self.model(**{k: subbatch[k] for k in subbatch if k in self.model_forward_args},
                                          **self.forward_kwargs)
@@ -576,7 +577,6 @@ class Trainer:
                 # todo: we can use other metrics than loss here
                 valid_metrics = self.validate(self.valid_dataloader)
                 valid_loss = valid_metrics['loss']
-                valid_metric = valid_metrics[self.args.optimize_metric]
                 if self.metric_improved_fn(best_valid_metric, valid_metric):
                     best_valid_metric = valid_metric
                     self.early_stopping_counter = 0
