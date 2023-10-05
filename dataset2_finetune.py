@@ -352,7 +352,7 @@ if __name__ == '__main__':
     # get train dataset
     args.task_name = 'dataset2'
     logger.info(f'preparing dataset for: {args.task_name}')
-    with open('/home/ubuntu/Documents/kwedage_research/DataTraining/cache/dataset2_1000.pkl', 'rb') as f:
+    with open('/home/dataset2_1000.pkl', 'rb') as f:
         dataset = pickle.load(f)
 
     train_dataset = dataset['train']
@@ -367,7 +367,7 @@ if __name__ == '__main__':
     valid_dataloader = None
     logger.info(f'preparing validation data from: {args.task_name}')
     # Kevin
-    valid_dataset = [dataset['valid'][0]]
+    valid_dataset =  dataset['valid'] # [dataset['valid'][0]]
 
     # Kevin
     #if args.task_name in tasks_with_duplicates:

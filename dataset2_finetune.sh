@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # CUDA_VISIBLE_DEVICES=1,2 NP=2 ./test_bert_sparse_pretrain_train_valid.sh
-NP=4
-CUDA_VISIBLE_DEVICES=0,1,2,3
+NP=1
+CUDA_VISIBLE_DEVICES=0
 set -e
 
 
@@ -13,16 +13,16 @@ MEMORY_CELL=modeling_rmt.language_modeling:MemoryCell
 RECURRENT_WRAPPER=modeling_rmt.language_modeling:RecurrentWrapper
 BACKBONE_CLS=transformers:AutoModelForCausalLM
 TASK_NAME=contract_nli
-METRIC=exact_match
+METRIC=loss
 
 ITERS=10000
-TBS=4
+TBS=1
 
-TGT_LEN=128
+TGT_LEN=1024
 INPUT_SIZE=512
 
-MAX_N_SEGMENTSS=(8 8)
-MEMORY_SIZES=(128 64)
+MAX_N_SEGMENTSS=(32 32)
+MEMORY_SIZES=(16 32)
 BSS=(1 1)
 
 for N in 1
@@ -51,7 +51,7 @@ do
 
 echo RUNNING: TASK_NAME SRC_LEN MODEL_NAME MODEL_CLS N_SEG MEMORY_SIZE INPUT_SEQ_LEN LR N
 echo RUNNING: $TASK_NAME $SRC_LEN $MODEL_NAME $MODEL_CLS $MAX_N_SEGMENTS $MEMORY_SIZE $INPUT_SEQ_LEN $LR $N
-accelerate launch --num_processes $NP --config_file /home/ubuntu/Documents/kwedage_research/t5/t5-experiments/accelerate.yaml /home/ubuntu/Documents/kwedage_research/t5/t5-experiments/dataset2_finetune.py \
+accelerate launch --num_processes $NP --config_file /home/t5-experiments/accelerate.yaml /home/t5-experiments/dataset2_finetune.py \
         --task_name $TASK_NAME \
         --model_path runs/test/${TASK_NAME}/$MODEL_NAME/lr${LR}_${SCHEDULER}_adamw_wd1e-03_${INPUT_SEQ_LEN}-${TGT_LEN}-${MAX_N_SEGMENTS}x${INPUT_SIZE}_mem${MEMORY_SIZE}_bs${TBS}_iters${ITERS}_${SEGMENT_ORDERING}_bptt-${K2}/run_$N \
         --from_pretrained $MODEL_NAME \
@@ -73,7 +73,7 @@ accelerate launch --num_processes $NP --config_file /home/ubuntu/Documents/kweda
         --lr ${LR} --lr_scheduler $SCHEDULER --num_warmup_steps $(($ITERS/10)) \
         --data_n_workers 2 \
         --log_interval $(($ITERS/100)) --valid_interval $(($ITERS/10)) \
-        --optimize_metric $METRIC --optimize_mode max \
+        --optimize_metric $METRIC --optimize_mode min \
         --show_valid_examples 5 \
         --early_stopping_patience 15 \
         --seed $(($N+42)) \
